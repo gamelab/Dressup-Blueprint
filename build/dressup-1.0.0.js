@@ -207,7 +207,9 @@ Play.create = function () {
     this.createDressup();
 
     //Create the buttons to deal with game options
-    this.createButtons();
+    this.createCustomButtons();
+    this.createSaveButtons();
+
 }
 
 
@@ -253,8 +255,8 @@ Play.createDressup = function() {
 
 
 
-//Holds the main code for dealing with the 'global' generic buttons
-Play.createButtons = function() {
+//Holds the code for generating buttons which deal with the customisation of the character.
+Play.createCustomButtons = function() {
 
     //Create the 'random' button with an event listener for when it is clicked
     this.randomButton = new Kiwi.GameObjects.Sprite(this, this.textures.randomBtn, 0, 289);
@@ -271,8 +273,88 @@ Play.createButtons = function() {
     //Create the 'camera' button with an event listener for when it is clicked
     this.showButton = new Kiwi.GameObjects.Sprite(this, this.textures.cameraBtn, 235, 289);
     this.addChild(this.showButton);
-    this.showButton.input.onUp.add(this.showCharacter, this);
+    this.showButton.input.onUp.add(this.showSaveButtons, this);
 }
+
+
+//Holds the code for generating buttons which deal with the saving/printing of the dressup game
+//These buttons are invisible by default
+Play.createSaveButtons = function() {
+
+    //Display the print button
+    this.printButton = new Kiwi.GameObjects.Sprite(this, this.textures.printBtn, 0, 289);
+    this.printButton.visible = false;
+    this.printButton.active = false;
+    this.addChild(this.printButton);
+
+    //Display the save button
+    this.saveButton = new Kiwi.GameObjects.Sprite(this, this.textures.saveBtn, 118, 289);
+    this.saveButton.visible = false;
+    this.saveButton.active = false;
+    this.addChild(this.saveButton);
+
+    //Display the back button
+    this.backButton = new Kiwi.GameObjects.Sprite(this, this.textures.backBtn, 235, 289);
+    this.backButton.visible = false;
+    this.backButton.active = false;
+    this.addChild(this.backButton);
+    this.backButton.input.onUp.add(this.showCreateButtons, this);
+
+
+    //Input Event for the save and print buttons.
+    //We will attach a callback direct to the input manager for these buttons so that the browser doesn't block any new windows we open or the like.
+    this.game.input.onUp.add(this.checkInputs, this);
+
+}
+
+
+Play.showCreateButtons = function() {
+    //Show the current buttons
+    this.randomButton.active = true;
+    this.randomButton.visible = true;
+    this.resetButton.active = true;
+    this.resetButton.visible = true;
+    this.showButton.active = true;
+    this.showButton.visible = true;
+
+    //Show the current buttons
+    this.printButton.visible = false;
+    this.printButton.active = false;
+    this.saveButton.visible = false;
+    this.saveButton.active = false;
+    this.backButton.visible = false;
+    this.backButton.active = false;
+
+    var len = this.buttons.length;
+    while(len--) {
+        this.buttons[len].visible = true;
+    }
+}
+
+Play.showSaveButtons = function(show) {
+    
+    //Show the current buttons
+    this.randomButton.active = false;
+    this.randomButton.visible = false;
+    this.resetButton.active = false;
+    this.resetButton.visible = false;
+    this.showButton.active = false;
+    this.showButton.visible = false;
+
+    //Show the current buttons
+    this.printButton.visible = true;
+    this.printButton.active = true;
+    this.saveButton.visible = true;
+    this.saveButton.active = true;
+    this.backButton.visible = true;
+    this.backButton.active = true;
+
+    var len = this.buttons.length;
+    while(len--) {
+        this.buttons[len].visible = false;
+    }
+}
+
 
 
 
@@ -282,7 +364,6 @@ Play.randomizeCharacter = function () {
     //Loop through the dressup elements and call the randomise method
     for(var i = 0; i < this.dressUpElements.length; i++) {
         this.dressUpElements[i].randomize();
-
     }
 
 
@@ -296,178 +377,119 @@ Play.resetCharacter = function () {
     //Loop through the dressup elements and call the randomise method
     for(var i = 0; i < this.dressUpElements.length; i++) {
         this.dressUpElements[i].reset();
-
     }
 
 }
 
 
-// Remove all dress up navigation and give print and save options. 
-Play.showCharacter = function () {
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**
-* The 'show' state is the state that is used when the user wants to 'print out' or 'save' their person.
-*
-* The difference between this state and the 'play' state is that this one doesn't contain next/previous buttons.
-* 
-*/
-
-var ShowState = new Kiwi.State('ShowState');
-
-
-/**
-* This create method is executed when the Kiwi game changes to the show state.
-* 
-* @method create
-* @param characterParts{object} The characterParts containing any dress up information
-* @private
-*/
-ShowState.create = function (characterParts) {
-
-    //Is the character being printed out?
-    this.printing = false;
-    this.capturing = false;
-
-    //Get the character parts
-    this.characterParts = characterParts;
-
-    if (characterParts != undefined) {
-        
-        //Loop through the parts and show them onscreen.
-        for (var i in characterParts) {
-            this[i] = new Kiwi.GameObjects.Sprite(this, this.textures[i], 100, 80);
-            this.addChildAt(this[i], 0);
-            this[i].animation.switchTo(characterParts[i]);
-        }
-
-    }
-
-    //Display the print button
-    this.printButton = new Kiwi.GameObjects.Sprite(this, this.textures.PrintBtn, 0, 289);
-    this.addChild(this.printButton);
-    this.printButton.input.onUp.add(this.printImg, this);
-
-    //Display the save button
-    this.saveButton = new Kiwi.GameObjects.Sprite(this, this.textures.SaveBtn, 118, 289);
-    this.addChild(this.saveButton);
-    this.saveButton.input.onUp.add(this.saveImg, this);
-
-    //Display the back button
-    this.backButton = new Kiwi.GameObjects.Sprite(this, this.textures.BackBtn, 235, 289);
-    this.addChild(this.backButton);
-    this.backButton.input.onUp.add(this.goBack, this);
-}
-
-
-/**
-* This method is executed when the print button was clicked.
-* Hides the buttons and sets the printing to true.
-* 
-*/
-ShowState.printImg = function () {
+//Holds the print functionality
+Play.print = function() {
+    //Hide the buttons
     this.printButton.visible = false;
     this.saveButton.visible = false;
     this.backButton.visible = false;
 
-    this.printing = true;
+    //Force the game to re-render.
+    this.game.cameras.render(); //generally not recommended if you can help it
+
+    //Create the data url of the canvas
+    var dataUrl = this.game.stage.canvas.toDataURL();
+
+
+    var windowContent = '<!DOCTYPE html>';
+    windowContent += '<html>'
+    windowContent += '<head><title>Your Dress Up</title></head>';
+    windowContent += '<body>'
+    windowContent += '<img src="' + dataUrl + '">';
+    windowContent += '</body>';
+    windowContent += '</html>';
+
+    //Open that 'html' in a new window.
+    var printWin = window.open('', '', 'width=1280,height=960');
+    printWin.document.open();
+    printWin.document.write(windowContent);
+    printWin.document.close();
+
+    //Focus that window and print.
+    printWin.focus();
+    printWin.print();
+    printWin.close();
+
+    //Show UI again.
+    this.printButton.visible = true;
+    this.saveButton.visible = true;
+    this.backButton.visible = true;
 }
 
 
-/**
-* This method is executed when the print button was clicked.
-* Hides the buttons and sets the capturing to true.
-* 
-*/
-ShowState.saveImg = function () {
+//Holds the save functionality
+Play.save = function() {
+
+    //Hide the buttons
     this.printButton.visible = false;
     this.saveButton.visible = false;
     this.backButton.visible = false;
 
-    this.capturing = true;
+    //Force the game to re-render.
+    this.game.cameras.render(); //generally not recommended if you can help it
+
+    //Get the canvas information
+    var img = this.game.stage.canvas.toDataURL("image/octet-stream");
+    
+    //Open it up in a new window.
+    window.open(img, "toDataURL() image", "width=1280, height=960");
+
+    //Show UI again.
+    this.printButton.visible = true;
+    this.saveButton.visible = true;
+    this.backButton.visible = true;
+
 }
 
 
-/**
-* The post render method is executed immediately after the stage has been rednered. 
-* 
-* We need this otherwise when it comes to 'saving' the canvas the buttons will still be visible (which we don't want).
-*
-*/
-ShowState.postRender = function () {
+//The callbacks used to see if the print or save buttons were pressed.
+Play.checkInputs = function(x,y) {
 
-    //Did the user want to print the stage?
-    if (this.printing) {
-
-        //Convert the canvas to an Image.
-        var dataUrl = this.game.stage.canvas.toDataURL();
-
-        //Create the new windows HTML.
-        var windowContent = '<!DOCTYPE html>';
-        windowContent += '<html>'
-        windowContent += '<head><title>Your Dress Up</title></head>';
-        windowContent += '<body>'
-        windowContent += '<img src="' + dataUrl + '">';
-        windowContent += '</body>';
-        windowContent += '</html>';
-
-        //Open that 'html' in a new window.
-        var printWin = window.open('', '', 'width=1280,height=960');
-        printWin.document.open();
-        printWin.document.write(windowContent);
-        printWin.document.close();
-
-        //Focus that window and print.
-        printWin.focus();
-        printWin.print();
-        printWin.close();
-
-        //Show UI again.
-        this.printButton.visible = true;
-        this.saveButton.visible = true;
-        this.backButton.visible = true;
-        this.printing = false;
+    //Print Button check
+    if(this.printButton.active && this.printButton.box.hitbox.contains(x,y)) {
+        this.print();
+        return;
     }
 
-    //Did the user want to 'save' the canvas.
-    if (this.capturing) {
-
-        //Get the canvas information
-        var img = this.game.stage.canvas.toDataURL("image/octet-stream");
-        
-        //Open it up in a new window.
-        window.open(img, "toDataURL() image", "width=1280, height=960");
-
-        //Show UI again.
-        this.printButton.visible = true;
-        this.saveButton.visible = true;
-        this.backButton.visible = true;
-        this.capturing = false;
+    //Save button check
+    if(this.saveButton.active && this.saveButton.box.hitbox.contains(x,y)) {
+        this.save();
+        return;
     }
+
 }
 
 
-/**
-* Is executed when the user wants to go back to the 'play' state.
-* 
-*/
-ShowState.goBack = function () {
-    game.states.switchState("PlayState", PlayState, null, { characterParts: this.characterParts });
+
+//Is called when this state is about to be switch off of and so destroyed.
+
+Play.shutDown = function() {
+
+    //Remove the input callback we have added.
+    this.game.input.onUp.remove(this.checkInputs, this);
+
+    //Make all the buttons we have added null, so attempt to mark them for garbage collection
+    this.printButton = null;
+    this.saveButton = null;
+    this.backButton = null;
+    this.randomButton = null;
+    this.showButton = null;
+    this.resetButton = null;
+
+    this.buttons = null;
+    this.dressUpElements = null;
 }
+
+
+
+
+
+
 
 
 
