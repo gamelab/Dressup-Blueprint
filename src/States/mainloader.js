@@ -43,6 +43,7 @@ MainLoader.preload = function () {
     this.addSpriteSheet('saveBtn', 'assets/img/buttons/saveBtn.png', 100, 100);
 
     //Load in the main menu assets 
+    this.addImage('kiwiName', 'assets/img/menu/kiwijs-name.png');
 
     //Load in the 'spinner' assets, which are displayed whilst loading is happening on the Play State.
     this.addImage('spinnerBackground', 'assets/img/spinner/spinnerSquare.png');

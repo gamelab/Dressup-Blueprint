@@ -8,13 +8,20 @@
 */
 
 
+//Create some gameoptions
+var gameoptions = {
+	width: 340,
+	height: 400
+}
+
+
 //Initialise the Kiwi Game. 
 
 /*
 * 'content' is the id of the element the game is going to be place inside of.
 * 'DressUpBlueprint' is the name of the game.
 */
-var game = new Kiwi.Game('content', 'DressUpBlueprint');
+var game = new Kiwi.Game('content', 'DressUpBlueprint', null, gameoptions);
 
 
 //Add all the States we are going to use.
