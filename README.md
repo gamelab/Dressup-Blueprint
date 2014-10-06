@@ -2,11 +2,16 @@ Dress Up Blueprint
 ======================================
 
 Name: Dress Up Blueprint
+
 Version: 1.0
-Type: Game
+
+Type: Blueprint
+
 Author: Kiwi.js Team
+
 Website: www.kiwijs.org
-KiwiJS last version tested: 0.5.3
+
+KiwiJS last version tested: 1.1.1
 
 ##Description:
 
