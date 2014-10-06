@@ -35,10 +35,10 @@ The blueprint needs to be set up by doing the following:
 STEP 1: 
 --------------------------------------------
 Preload any images used.
-In the loadingState.js file, preload any spritesheets used.
+In the MainLoader.js file, preload any spritesheets used.
 
 	Example: 
-	loadingState.preload = function () {
+	MainLoader.preload = function () {
 		this.addSpriteSheet('head', 'assets/head.png', 150, 117);
 	};
 

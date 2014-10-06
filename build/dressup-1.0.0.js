@@ -1,328 +1,323 @@
 /**
-* We have included the IntroState just to detail that if you wanted to have a main-menu then this would be the place to put it.
-* 
-* Currently we just switch straight to the 'play' state.
+*  
+* The Option GameObject is the gameobject use for a piece of clothing/makeup/e.t.c.
+* It contains some custom code for dressup games.
 * 
 */
 
-var IntroState = new Kiwi.State('IntroState');
-
-
-IntroState.create = function () {
-
-    //This state is currently skipped, but can be used as a main menu page.
-    game.states.switchState("PlayState", PlayState, null, { characterParts: { head: 0,arms: 0,  chest: 0, legs: 0  } });
+var Option = function(state, texture, ex, ey) {
+	
+	Kiwi.GameObjects.Sprite.call(this, state, texture, ex, ey);
 
 }
+
+Kiwi.extend(Option, Kiwi.GameObjects.Sprite);
+
+
+//Resets this option to the first frame.
+Option.prototype.reset = function() {
+	this.cellIndex = 0;
+}
+
+
+//Makes the element go to the next frame.
+//This would be when a user wants to go to the next clothing item, e.t.c.
+Option.prototype.next = function() {
+	this.animation.nextFrame();
+}
+
+
+//Makes the element go to the previous frame
+//This would be when a user wants to go to the previous clothing item.
+Option.prototype.prev = function() {
+	this.animation.prevFrame();
+}
+
+
+//Choose a random piece of clothing.
+Option.prototype.randomize = function() {
+
+	this.cellIndex = this.game.rnd.integerInRange( 0, this.animation.length );
+
+}
+
+
+
+
 /**
-* The Loading State is going to be used to load in all of the in-game assets that we need in game.
-*
-* Because in this blueprint the user can only 'dress-up' a single "character" we are going to load in all of 
-* the asset's at this point.
-*
-* If you have multiple states however, I would recommend have loading the other graphics as they are required by their states, 
-* Otherwise the loading times maybe a bit long. 
+* The Loading State is used to load in all of the GLOBAL in-game assets that we need in game.
+* GLOBAL assets are the type of assets that we want to always be in the game, because they are used so often.
 *
 */
 
-var LoadingState = new Kiwi.State('LoadingState');
+
+
+/**
+* Since we want to use the custom Kiwi.JS loader with the bobing kiwi/html5 logo. We need to extend the KiwiLoadingScreen State.  
+* The KiwiLoadingScreen State is an extentsion of a normal State but it has some custom code to handle the loading/bobbing/fading of all the items, so if you override a method (like the preload) for example just make sure you call the super method.
+* 
+* The parameters we are passing into this method are as ordered.
+* 1 - name {String} Name of this state.
+* 2 - stateToSwitch {String} Name of the state to switch to AFTER all the assets have loaded. Note: The state you want to switch to should already have been added to the game.
+* 3 - subfolder {String} The folder that the loading graphics are located at. 
+*/
+var MainLoader = new KiwiLoadingScreen('MainLoader', 'MainMenu', 'assets/img/loading/');
 
 /**
 * This preload method is responsible for preloading all of our in game assets.
+* Each time this state is switched to, it will attempt to load in these graphics
 *
 * @method preload
 */
-LoadingState.preload = function () {
+MainLoader.preload = function () {
 
-    //Load in the chest/head graphics
-    this.addSpriteSheet('head', 'assets/img/head.png', 150, 117);
-    this.addSpriteSheet('chest', 'assets/img/chest.png', 150, 117);
-    this.addSpriteSheet('arms', 'assets/img/arms.png', 150, 117);
-    this.addSpriteSheet('legs', 'assets/img/legs.png', 150, 117);
-
-    //Load in the Buttons we require
-    this.addSpriteSheet('CameraBtn', 'assets/img/buttons/CameraBtn.png', 100, 100);
-    this.addSpriteSheet('RandomBtn', 'assets/img/buttons/RandomBtn.png', 100, 100);
-    this.addSpriteSheet('ResetBtn', 'assets/img/buttons/ResetBtn.png', 100, 100);
-
-    this.addSpriteSheet('NextBtn', 'assets/img/buttons/NextBtn.png', 63, 63);
-    this.addSpriteSheet('PrevBtn', 'assets/img/buttons/PrevBtn.png', 63, 63);
-
-    this.addSpriteSheet('BackBtn', 'assets/img/buttons/BackBtn.png', 100, 100);
-    this.addSpriteSheet('PrintBtn', 'assets/img/buttons/PrintBtn.png', 100, 100);
-    this.addSpriteSheet('SaveBtn', 'assets/img/buttons/SaveBtn.png', 100, 100);
-
-    /**
-    * Create our Background Image and any assets that we want to display to the user as the game is loading.
-    * Also adds a on-click event.
-    */
-    this.bg = new Kiwi.GameObjects.Sprite(this, this.textures.kiwiImg, 390, 280);
-    this.addChild(this.bg);
-    
-    this.bg.input.onUp.add(this.pressIntro);
-};
+    //Make sure to call the super at the top.
+    //Otherwise the loading graphics will load last, and that defies the whole point in loading them. 
+    KiwiLoadingScreen.prototype.preload.call(this);
 
 
-/**
-* This create method is executed when the Kiwi game enters the loading state after all the assets have been loaded.
-* At this point we can switch to our 'intro' state.
+    //Load in all of the generic buttons.
+    this.addSpriteSheet('cameraBtn', 'assets/img/buttons/cameraBtn.png', 100, 100);
+    this.addSpriteSheet('randomBtn', 'assets/img/buttons/randomBtn.png', 100, 100);
+    this.addSpriteSheet('resetBtn', 'assets/img/buttons/resetBtn.png', 100, 100);
 
-* @method create
-*
-*/
-LoadingState.create = function () {
+    this.addSpriteSheet('nextBtn', 'assets/img/buttons/nextBtn.png', 63, 63);
+    this.addSpriteSheet('prevBtn', 'assets/img/buttons/prevBtn.png', 63, 63);
 
-    game.states.switchState("IntroState");
+    this.addSpriteSheet('backBtn', 'assets/img/buttons/backBtn.png', 100, 100);
+    this.addSpriteSheet('printBtn', 'assets/img/buttons/printBtn.png', 100, 100);
+    this.addSpriteSheet('saveBtn', 'assets/img/buttons/saveBtn.png', 100, 100);
 
-};
+    //Load in the main menu assets 
+
+    //Load in the 'spinner' assets, which are displayed whilst loading is happening on the Play State.
+    this.addImage('spinnerBackground', 'assets/img/spinner/spinnerSquare.png');
+    this.addImage('spinner', 'assets/img/spinner/spinner.png');
 
 
-/**
-* This method is executed if the user clicks on the screen as the graphics are loading.
-* Will make the browser go our website!
-* @method create
-* @private 
-*/
-LoadingState.pressIntro = function () {
-    window.open("http://www.kiwijs.org");
 }
 
 
-/*
-* If you want to include a 'process' or a loading graphic telling the user how many bytes/files/e.t.c are being loaded
-* Then you can make use of the 'loadProgress' method. 
+
+
+
+
+
+
+
+
+
+/**
+* 
+* The MainMenu State is as its name suggests, the state for the main menu of the game.
+* In this state we are just going to have a link to 'start/play' the game,
+* but here would you add all other main menu functionality, like viewing leaderboards.
+* 
+* Or in the case of a Dressup game, perhaps a way to view how others have dressed-up a particular character?
+* 
 */
-LoadingState.loadProgress = function (percent, bytesLoaded, file) {
-  
+
+var MainMenu = new Kiwi.State('MainMenu');
+
+
+MainMenu.create = function () {
+
+	this.game.stage.color = 'fff';
+
+    //This state is currently skipped, but can be used as a main menu page.
+    this.game.states.switchState("Play");
+
 }
 
-var PlayState = new Kiwi.State('PlayState');
+/**
+* 
+* The Play State is the state handles the majority of the in-game logic. 
+* In the case of the Dressup Game, the logic this would handle is anything to do with, 
+* - Switching between items of clothing/makeup/e.t.c.
+* - Taking screenshots.
+* - Randomisation of clothing/e.t.c.
+* 
+*/
+var Play = new Kiwi.State('Play');
 
 
 /**
-* The PlayState in the core state that is used in the game. 
-*
-* It is the state where majority of the functionality occurs 'in-game' occurs.
+* 
+* We are going to use the preload method on this state to load all the assets that we need in this particular state.
+* The reason we have not added them to the MainLoader is because these assets we do not want to be GLOBAL, 
+* but instead only want them to be there whilst this state is active, and then go away (to save memory).
 * 
 */
+Play.preload = function() {
+
+    //Load in all of the body parts. Make sure that you set the 'storeAsGlobal' flag to 'false'
+    this.addSpriteSheet('head', 'assets/img/character/head.png', 150, 117, false);
+    this.addSpriteSheet('chest', 'assets/img/character/chest.png', 150, 117, false);
+    this.addSpriteSheet('arms', 'assets/img/character/arms.png', 150, 117, false);
+    this.addSpriteSheet('legs', 'assets/img/character/legs.png', 150, 117, false);
+
+    //Create spinner
+    this.createLoader();
+
+}
 
 
-/**
-* When this state is switched to a 'characterParts' parameter will be passed.
-* If passed this parameter will contains a number for a particular 'part' (Arm/Leg/Torso/e.t.c) that should be used. 
-*
-* 
-* @method create
-* @param characterParts{Object} The list of character parts with corresponding variables.
-* @private
-*/
-PlayState.create = function (characterParts) {
+//Creates the loader. This should happen at the preload stage
+Play.createLoader = function() {
+    this.spinnerBackground = new Kiwi.GameObjects.StaticImage(this, this.textures.spinnerBackground);
+    this.addChild(this.spinnerBackground);
 
-    //Get the character parts and store them in a property to be used later on.
-    this.characterParts = characterParts;
+    this.spinner = new Kiwi.GameObjects.StaticImage(this, this.textures.spinner);
+    this.addChild(this.spinner);
 
+    this.spinnerBackground.x = (this.game.stage.width - this.spinnerBackground.width) * 0.5;
+    this.spinner.x = (this.game.stage.width - this.spinner.width) * 0.5;
 
-    /**
-    * Automatically generated cycle button positioning variables.
-    */
-    var leftButtonX = 0;
-    var rightButtonX = 273;
-    var buttonGapY = 70;
-    var yDiff = 0;
+    this.spinnerBackground.y = (this.game.stage.height - this.spinnerBackground.height) * 0.5;
+    this.spinner.y = (this.game.stage.height - this.spinner.height) * 0.5;
+}
 
 
-    if (characterParts != undefined) {
+//The 'loadUpdate' is executed as the update loop, dur
+Play.loadUpdate = function() {
+
+    //Spin the spinner
+    this.spinner.rotation += Math.PI / 6;
+
+}
 
 
-        //Loop through the parts that were passed.
-        for (var i in characterParts) {
-
-            /*
-            * Add dress up elements dynamically via characterParts.
-            *
-            * Note: The texture for the particular dress up element we are creating (in this case) has the excat same name as the element itself.  
-            * Also we are always going to add the dress up elements at the bottom. That way the first elements added will be at the top.
-            */
-            this[i] = new Kiwi.GameObjects.Sprite(this, this.textures[i], 100, 80);
-            this.addChildAt(this[i], 0);
-            this[i].name = i;
-            this[i].animation.switchTo(characterParts[i]);
-            
-
-            //Create a new left button that we will use to cycle to the previous part of the type we just generated.
-            this[i + 'LeftBtn'] = new Kiwi.GameObjects.Sprite(this, this.textures.PrevBtn, leftButtonX, yDiff);
-            this.addChild(this[i + 'LeftBtn']);
-            this[i + 'LeftBtn'].tag = i;        //Store which element this left button is for.
-            this[i + 'LeftBtn'].input.onUp.add(this.pressLeft, this);
+//Removes the loader. This will happen at the create state, after all the assets have been loaded.
+Play.removeLoader = function() {
+    this.spinnerBackground.exists = false;
+    this.spinner.exists = false;
+    this.spinnerBackground = null;
+    this.spinner = null;
+}
 
 
-            //Create a new right button that we will use to cycle to the next part of the type we just generated. 
-            this[i + 'RightBtn'] = new Kiwi.GameObjects.Sprite(this, this.textures.NextBtn, rightButtonX, yDiff);
-            this.addChild(this[i + 'RightBtn']);
-            this[i + 'RightBtn'].tag = i;       //Store which element this right button is for
-            this[i + 'RightBtn'].input.onUp.add(this.pressRight, this);
+//Executed once all the game assets have been loaded. 
+//In charge of remove the loader, and setting up the game 
+Play.create = function () {
 
-            yDiff += buttonGapY;
+    //Remove the loader
+    this.removeLoader();
 
-        }
+    //Create the dressup elements
+    this.createDressup();
 
+    //Create the buttons to deal with game options
+    this.createButtons();
+}
+
+
+
+//Handles the creation of the dressup items
+Play.createDressup = function() {
+
+    //Create the background. 
+    //In this example we do not have a background, so we will skip this step.
+
+
+    //We are going to store all of the dress up parts inside this array, to keep track of them.
+    this.dressUpElements = [];
+
+    this.dressUpElements.push(new Option(this, this.textures.legs, 100, 80));
+    this.dressUpElements.push(new Option(this, this.textures.chest, 100, 80));  
+    this.dressUpElements.push(new Option(this, this.textures.arms, 100, 80));
+    this.dressUpElements.push(new Option(this, this.textures.head, 100, 80));
+
+    this.buttons = [];
+
+    var btnBotY = (this.dressUpElements.length - 1) * 70;
+
+    //Now we loop through the dress up parts and create buttons for each, and add them
+    for(var i = 0; i < this.dressUpElements.length; i++) {
+
+        var item = this.dressUpElements[i];
+
+        var nextBtn = new Kiwi.GameObjects.Sprite(this, this.textures.nextBtn, 273, btnBotY - 70 * i);
+        nextBtn.input.onUp.add(item.next, item);
+        this.buttons.push(nextBtn);
+
+        var prevBtn = new Kiwi.GameObjects.Sprite(this, this.textures.prevBtn, 0, btnBotY - 70 * i);
+        prevBtn.input.onUp.add(item.prev, item);
+        this.buttons.push(prevBtn);
+
+        this.addChild(nextBtn);
+        this.addChild(prevBtn);
+        this.addChild(item);
     }
 
+}
+
+
+
+//Holds the main code for dealing with the 'global' generic buttons
+Play.createButtons = function() {
 
     //Create the 'random' button with an event listener for when it is clicked
-    this.randomButton = new Kiwi.GameObjects.Sprite(this, this.textures.RandomBtn, 0, 289);
+    this.randomButton = new Kiwi.GameObjects.Sprite(this, this.textures.randomBtn, 0, 289);
     this.addChild(this.randomButton);
     this.randomButton.input.onUp.add(this.randomizeCharacter, this);
     
 
     //Create the 'reset' button with an event listener for when it is clicked
-    this.resetButton = new Kiwi.GameObjects.Sprite(this, this.textures.ResetBtn, 118, 289);
+    this.resetButton = new Kiwi.GameObjects.Sprite(this, this.textures.resetBtn, 118, 289);
     this.addChild(this.resetButton);
     this.resetButton.input.onUp.add(this.resetCharacter, this);
     
 
     //Create the 'camera' button with an event listener for when it is clicked
-    this.showButton = new Kiwi.GameObjects.Sprite(this, this.textures.CameraBtn, 235, 289);
+    this.showButton = new Kiwi.GameObjects.Sprite(this, this.textures.cameraBtn, 235, 289);
     this.addChild(this.showButton);
     this.showButton.input.onUp.add(this.showCharacter, this);
 }
 
 
-/**
-* Updates all of the characters frames via the characterParts variables.
-* Used when a clicks on a dress-up element and so whole character updates. 
-*
-* @method updateCharacter
-* @public
-* 
-*/
-PlayState.updateCharacter = function () {
-    for (var i in this.characterParts) {
-        this[i].animation.switchTo( this.characterParts[i] );
-    }
-}
 
-
-/**
-* This method gets executed when the user clicks on a 'left' button. 
-* So they want a dress-up element to go to its 'previous' frame.
-*
-* @method pressLeft
-* @public
-*/
-
-PlayState.pressLeft = function (piece) {
-
-    //Get the name of the dress-up element we want to go next.
-    var clip = this[piece.tag];
+// Randomize character based on the amount of frames each dress up element has.
+Play.randomizeCharacter = function () {
     
-    //Updates the relevant character part with the new frame
-    if (clip.animation.frameIndex == 0) {
-        this.characterParts[piece.tag] = clip.animation.currentAnimation.length - 1;
-    } else {
-        this.characterParts[piece.tag]--;
+    //Loop through the dressup elements and call the randomise method
+    for(var i = 0; i < this.dressUpElements.length; i++) {
+        this.dressUpElements[i].randomize();
+
     }
 
-    //Update the character
-    this.updateCharacter();
+
 }
 
-/**
-* This method gets executed when the user clicks on a 'right' button. 
-* So they want a dress-up element to go to its 'next' frame.
-*
-* @method pressRight
-* @public
-* 
-*/
 
-PlayState.pressRight = function (piece) {
 
-    //Get the name of the dress-up element we want to go next.
-    var clip = this[piece.tag];
+//Set all dress up element animations to their first frame (which is the default).
+Play.resetCharacter = function () {
 
-    //Updates the relevant character part with the new frame
-    if (clip.animation.frameIndex == (clip.animation.currentAnimation.length - 1)) {
-        this.characterParts[piece.tag] = 0;
-    } else {
-        this.characterParts[piece.tag]++;
+    //Loop through the dressup elements and call the randomise method
+    for(var i = 0; i < this.dressUpElements.length; i++) {
+        this.dressUpElements[i].reset();
+
     }
 
-    //Update the character
-    this.updateCharacter();
 }
 
 
-/**
-* Randomize character based on the amount of frames each dress up element has.
-* 
-* @method randomizeCharacter
-* @public
-*/
-PlayState.randomizeCharacter = function () {
-    for (var i in this.characterParts) {
-        var clip = this[i];
-        var r = Math.floor(Math.random() * clip.animation.currentAnimation.length);
-        this.characterParts[i] = r;
-    }
-    this.updateCharacter();
+// Remove all dress up navigation and give print and save options. 
+Play.showCharacter = function () {
+
 }
 
 
-/**
-* Set all dress up element animations to their first frame (which is the default).a
-*
-* @method resetCharacter
-* @public 
-*/
-PlayState.resetCharacter = function () {
-    for (var i in this.characterParts) {
-        this.characterParts[i] = 0;
-    }
-    this.updateCharacter();
-}
 
 
-/**
-* Remove all dress up navigation and give print and save options. 
-* These functionalities are stored on the 'show' state. 
-*
-* @method showCharacter
-* @public
-*/
-PlayState.showCharacter = function () {
-    game.states.switchState("ShowState", ShowState, null, { characterParts: this.characterParts });
-}
-/**
-* The preload state is used purely to load all files required by the loader.
-* 
-* E.g. Any loading gifs/background graphics that are displayed to the user 'in-game' while they are waiting for the game to load.
-*/
 
 
-//Create the Preload State
-var Preloader = new Kiwi.State('Preloader');
 
 
-//Load in the Preloading Graphic.
-Preloader.preload = function () {
-	 
-    this.addImage('kiwiImg', 'assets/img/loadingImage.png');
-
-};
 
 
-/* 
-* Once the graphic has been loaded, switch to the Loading State 
-* which will handle the Loading of all other in-game assets.
-*/
-Preloader.create = function () {
 
-	//Resize the game stage to the correct size.
-    game.stage.resize(340, 400);
-    game.states.switchState("LoadingState");
 
-};
 
 
 /**
@@ -480,23 +475,26 @@ ShowState.goBack = function () {
 /**
 * The core Dress-up blueprint game file.
 * 
-* This file is only used to initalise (start-up) the main Kiwi Game 
-* and add all of the relevant states to that Game.
-*
+* This file is only used to initalise (start-up) the main Kiwi Game ,
+* add all of the relevant states to that Game,
+* and then choose which one to load first.
 */
 
 
 //Initialise the Kiwi Game. 
-var game = new Kiwi.Game('content', 'DressUpGame', null, { renderer: Kiwi.RENDERER_CANVAS });
+
+/*
+* 'content' is the id of the element the game is going to be place inside of.
+* 'DressUpBlueprint' is the name of the game.
+*/
+var game = new Kiwi.Game('content', 'DressUpBlueprint');
 
 
 //Add all the States we are going to use.
-game.states.addState(Preloader);
-game.states.addState(LoadingState);
-game.states.addState(IntroState);
-game.states.addState(PlayState);
-game.states.addState(ShowState);
+game.states.addState(MainLoader);
+game.states.addState(MainMenu);
+game.states.addState(Play);
 
 
 //Switch to/use the Preloader state. 
-game.states.switchState("Preloader");
+game.states.switchState("MainLoader");

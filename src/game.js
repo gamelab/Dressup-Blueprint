@@ -2,23 +2,26 @@
 /**
 * The core Dress-up blueprint game file.
 * 
-* This file is only used to initalise (start-up) the main Kiwi Game 
-* and add all of the relevant states to that Game.
-*
+* This file is only used to initalise (start-up) the main Kiwi Game ,
+* add all of the relevant states to that Game,
+* and then choose which one to load first.
 */
 
 
 //Initialise the Kiwi Game. 
-var game = new Kiwi.Game('content', 'DressUpGame', null, { renderer: Kiwi.RENDERER_CANVAS });
+
+/*
+* 'content' is the id of the element the game is going to be place inside of.
+* 'DressUpBlueprint' is the name of the game.
+*/
+var game = new Kiwi.Game('content', 'DressUpBlueprint');
 
 
 //Add all the States we are going to use.
-game.states.addState(Preloader);
-game.states.addState(LoadingState);
-game.states.addState(IntroState);
-game.states.addState(PlayState);
-game.states.addState(ShowState);
+game.states.addState(MainLoader);
+game.states.addState(MainMenu);
+game.states.addState(Play);
 
 
 //Switch to/use the Preloader state. 
-game.states.switchState("Preloader");
+game.states.switchState("MainLoader");
