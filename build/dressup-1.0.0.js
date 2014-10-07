@@ -207,13 +207,15 @@ Play.createLoader = function() {
 Play.loadUpdate = function() {
 
     //Spin the spinner
-    this.spinner.rotation += Math.PI / 6;
+    if(this.game.frame % 15 == 0)  this.spinner.rotation += Math.PI / 6;
 
 }
 
 
 //Removes the loader. This will happen at the create state, after all the assets have been loaded.
 Play.removeLoader = function() {
+    this.spinnerBackground.visible = false;
+    this.spinner.visible = false;
     this.spinnerBackground.exists = false;
     this.spinner.exists = false;
     this.spinnerBackground = null;
@@ -221,12 +223,17 @@ Play.removeLoader = function() {
 }
 
 
-//Executed once all the game assets have been loaded. 
-//In charge of remove the loader, and setting up the game 
-Play.create = function () {
-
+//When the files needed have been loaded, remove the loader
+Play.loadComplete = function() {
     //Remove the loader
     this.removeLoader();
+}
+
+
+//Executed once all the game assets have been loaded. 
+//In charge of setting up the game 
+Play.create = function () {
+
 
     //Create the dressup elements
     this.createDressup();
